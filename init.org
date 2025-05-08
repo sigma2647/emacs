@@ -101,6 +101,22 @@
   ;; 在进入普通模式时切换到英文输入法
   (add-hook 'evil-normal-state-entry-hook 'switch-to-english-input)
 
+  ;; 自定义键位映射
+  (evil-define-key 'normal 'global
+    "H" 'evil-first-non-blank  ;; 移动到行首非空白字符
+    "L" 'evil-end-of-line)     ;; 移动到行尾
+
+  (evil-define-key 'visual 'global
+    "H" 'evil-first-non-blank  ;; 移动到行首非空白字符
+    "L" 'evil-end-of-line)     ;; 移动到行尾
+
+  ;; 可选：添加更多常用键位映射
+  (evil-define-key 'normal 'global
+    "gh" 'evil-window-top      ;; 移动到窗口顶部
+    "gl" 'evil-window-bottom   ;; 移动到窗口底部
+    "gj" 'evil-next-line       ;; 向下移动一行
+    "gk" 'evil-previous-line)  ;; 向上移动一行
+
   (provide 'init-evil)
 #+end_src
 
@@ -197,6 +213,77 @@
   (provide 'init-org)
 #+end_src
 
+* 启动配置
+#+begin_src emacs-lisp :tangle lisp/init-startup.el
+;;; init-startup.el --- Initialize startup configurations -*- lexical-binding: t -*-
+
+;; ┌─────────┐
+;; │ setting │
+;; └─────────┘
+
+;; 设置 logo
+(defcustom centaur-logo (expand-file-name
+                        (if (display-graphic-p) "~/.emacs.d/dashboard/eva.png" "~/.emacs.d/dashboard/banner.txt")
+                        user-emacs-directory)
+  "Set Centaur logo. nil means official logo."
+  :group 'centaur
+  :type 'string)
+
+;; 设置启动缓冲区
+(defun my/startup-buffer ()
+  "Return the buffer to show at startup."
+  (let ((file (car (cdr command-line-args))))  ;; 获取第一个非选项参数
+    (if (and file (file-exists-p file))
+        (find-file file)
+      (get-buffer-create "*dashboard*"))))
+
+;; 设置启动行为
+(setq initial-buffer-choice #'my/startup-buffer)
+
+;; 处理命令行参数
+(add-hook 'after-init-hook
+          (lambda ()
+            (when (and (not (daemonp))
+                      (not (get-buffer "*dashboard*")))
+              (dashboard-refresh-buffer))))
+
+(provide 'init-startup)
+#+end_src
+
+* Dashboard 配置
+#+begin_src emacs-lisp :tangle lisp/init-dashboard.el
+;;; init-dashboard.el --- Initialize dashboard configurations -*- lexical-binding: t -*-
+
+(use-package dashboard
+  :ensure t
+  :init
+  (add-hook 'after-init-hook 'dashboard-refresh-buffer)
+  :custom
+  (dashboard-startup-banner (or centaur-logo 'official))  ;; 使用自定义 logo
+  (dashboard-banner-logo-title "Welcome to Emacs")  ;; 欢迎信息
+  (dashboard-set-heading-icons t)  ;; 显示标题图标
+  (dashboard-set-file-icons t)     ;; 显示文件图标
+  (dashboard-center-content t)     ;; 居中显示内容
+  (dashboard-image-banner-max-width 300)  ;; 图片最大宽度
+  (dashboard-image-banner-max-height 300) ;; 图片最大高度
+  (dashboard-items '((recents  . 5)    ;; 最近文件数量
+                     (projects . 5)    ;; 项目数量
+                     (bookmarks . 5))) ;; 书签数量
+  :config
+  (dashboard-setup-startup-hook))
+
+;; 可选：自定义 dashboard 样式
+(with-eval-after-load 'dashboard
+  ;; 设置 dashboard 主题
+  (setq dashboard-theme 'doom)
+  ;; 自定义 dashboard 项目
+  (setq dashboard-projects-backend 'projectile)
+  ;; 设置 dashboard 刷新间隔（秒）
+  (setq dashboard-refresh-buffer-time 300))
+
+(provide 'init-dashboard)
+#+end_src
+
 * 主入口
 #+begin_src emacs-lisp :tangle init.el
   ;; 添加 lisp 目录到 load-path
@@ -210,6 +297,8 @@
   (require 'init-font)
   (require 'init-markdown)
   (require 'init-org)
+  (require 'init-startup)  ;; 添加启动配置
+  (require 'init-dashboard)  ;; 添加 dashboard 模块
 #+end_src
 
 * Local Variables

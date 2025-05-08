@@ -10,4 +10,6 @@
 (require 'init-font)
 (require 'init-markdown)
 (require 'init-org)
+(require 'init-startup)  ;; 添加启动配置
+(require 'init-dashboard)  ;; 添加 dashboard 模块
 ;; 主入口:1 ends here
