@@ -1,14 +1,12 @@
 ;; [[file:../init.org::*Dashboard 配置][Dashboard 配置:1]]
 ;;; init-dashboard.el --- Initialize dashboard configurations -*- lexical-binding: t -*-
 
-;; 确保 all-the-icons 和 nerd-icons 已安装
+;; 确保 all-the-icons 已安装并正确加载
 (use-package all-the-icons
   :ensure t
-  :if (display-graphic-p))
-
-(use-package nerd-icons
-  :ensure t
-  :if (display-graphic-p))
+  :if (display-graphic-p)
+  :config
+  (require 'all-the-icons))
 
 (use-package dashboard
   :ensure t
@@ -62,7 +60,7 @@
   (setq dashboard-center-content t)
   (setq dashboard-page-break-line t)
   (setq dashboard-display-icons-p t)
-  (setq dashboard-icon-type 'all-the-icons)  ;; 使用 all-the-icons 而不是 nerd-icons
+  (setq dashboard-icon-type 'all-the-icons)  ;; 使用 all-the-icons
   
   ;; 添加自定义 CSS
   (add-hook 'dashboard-mode-hook
