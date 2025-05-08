@@ -1,0 +1,100 @@
+
+#+PROPERTY: header-args :tangle yes :comments yes :results silent
+
+* add mirror
+#+begin_src emacs-lisp
+  (require 'package)
+  (setq package-archives
+      '(("gnu"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+        ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+        ("org"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
+  (package-initialize)
+
+  (unless (package-installed-p 'use-package )
+    (package-refresh-contents)
+    (package-install 'use-package )
+    (package-install 'evil ))
+#+end_src
+
+
+* evilmode
+#+begin_src emacs-lisp
+  (require 'evil)
+  (evil-mode 1)
+#+end_src
+
+* Level 1
+
+** Level 2
+
+hello
+type some stuff
+
+#+begin_src emacs-lisp
+
+  (setq inhibit-splash-screen t)
+  (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+  (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+  (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+  (menu-bar-mode -1)
+
+
+
+  (prefer-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (setq locale-coding-system 'utf-8)
+  (setq default-buffer-file-coding-system 'utf-8)
+
+
+
+
+
+#+end_src
+
+*** UI
+
+enable pixel scroll
+
+#+begin_src emacs-lisp
+  (pixel-scroll-precision-mode 1)
+  (setq pixel-scroll-precision-interpolate-page t)
+  (defalias 'scroll-up-command 'pixel-scroll-interpolate-down)
+  (defalias 'scroll-down-command 'pixel-scroll-interpolate-up)
+#+end_src
+
+** org mode
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+#+end_src
+
+* TODO evilmode
+* TODO magit
+* TODO Package Manager / Use Package
+
+
+* font
+
+
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil :font "Maple Mono NF CN" :height 140)  ; 14pt
+  
+  ;; 显式设置中文字体（可选，如果 Maple Mono NF CN 已经含中文）
+  (set-fontset-font t 'han (font-spec :family "Maple Mono NF CN"))
+#+end_src
+
+* Local Variables
+
+# Local Variables:
+# eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
+# End:
+
+
+
+
+sdfsdf
+
+| sdf  | sdf |
+| iikj |     |
+| sdf  |     |
