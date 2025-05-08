@@ -1,19 +1,25 @@
-
-#+PROPERTY: header-args :tangle yes :comments yes :results silent
+#+Property: header-args :tangle yes :comments yes :results silent
 
 * add mirror
 #+begin_src emacs-lisp
   (require 'package)
   (setq package-archives
-      '(("gnu"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-        ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-        ("org"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
+        '(("gnu"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+          ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+          ("org"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
   (package-initialize)
 
-  (unless (package-installed-p 'use-package )
-    (package-refresh-contents)
-    (package-install 'use-package )
-    (package-install 'evil ))
+  ;; Ensure package contents are loaded
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+  ;; Ensure `use-package` and `evil` are installed
+  (dolist (pkg '(use-package evil))
+    (unless (package-installed-p pkg)
+      (package-install pkg)))
+
+  ;; Make M-p work like M-x
+  (global-set-key (kbd "M-p") 'execute-extended-command)
 #+end_src
 
 
@@ -27,8 +33,6 @@
 
 ** Level 2
 
-hello
-type some stuff
 
 #+begin_src emacs-lisp
 
@@ -98,3 +102,4 @@ sdfsdf
 | sdf  | sdf |
 | iikj |     |
 | sdf  |     |
+|      |     |

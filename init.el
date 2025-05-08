@@ -1,15 +1,22 @@
 ;; [[file:init.org::*add mirror][add mirror:1]]
 (require 'package)
 (setq package-archives
-    '(("gnu"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-      ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-      ("org"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
+      '(("gnu"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+        ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
+        ("org"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
 (package-initialize)
 
-(unless (package-installed-p 'use-package )
-  (package-refresh-contents)
-  (package-install 'use-package )
-  (package-install 'evil ))
+;; Ensure package contents are loaded
+(unless package-archive-contents
+  (package-refresh-contents))
+
+;; Ensure `use-package` and `evil` are installed
+(dolist (pkg '(use-package evil))
+  (unless (package-installed-p pkg)
+    (package-install pkg)))
+
+;; Make M-p work like M-x
+(global-set-key (kbd "M-p") 'execute-extended-command)
 ;; add mirror:1 ends here
 
 ;; [[file:init.org::*evilmode][evilmode:1]]
@@ -51,3 +58,18 @@
 ;; 显式设置中文字体（可选，如果 Maple Mono NF CN 已经含中文）
 (set-fontset-font t 'han (font-spec :family "Maple Mono NF CN"))
 ;; font:1 ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages nil)
+ '(safe-local-variable-values
+   '((eval add-hook 'after-save-hook (lambda nil (org-babel-tangle)) nil
+	   t))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
