@@ -274,13 +274,18 @@
 #+begin_src emacs-lisp :tangle lisp/init-dashboard.el
 ;;; init-dashboard.el --- Initialize dashboard configurations -*- lexical-binding: t -*-
 
-;; 确保 all-the-icons 已安装
+;; 确保 all-the-icons 和 nerd-icons 已安装
 (use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
+
+(use-package nerd-icons
   :ensure t
   :if (display-graphic-p))
 
 (use-package dashboard
   :ensure t
+  :init
   :custom
   (dashboard-startup-banner (or centaur-logo 'official))  ;; 使用自定义 logo
   (dashboard-banner-logo-title "Welcome to Emacs")  ;; 欢迎信息
@@ -330,7 +335,7 @@
   (setq dashboard-center-content t)
   (setq dashboard-page-break-line t)
   (setq dashboard-display-icons-p t)
-  (setq dashboard-icon-type 'nerd-icons)
+  (setq dashboard-icon-type 'all-the-icons)  ;; 使用 all-the-icons 而不是 nerd-icons
   
   ;; 添加自定义 CSS
   (add-hook 'dashboard-mode-hook
