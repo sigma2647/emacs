@@ -8,8 +8,6 @@
 
 (use-package dashboard
   :ensure t
-  :init
-  (add-hook 'after-init-hook 'dashboard-refresh-buffer)
   :custom
   (dashboard-startup-banner (or centaur-logo 'official))  ;; 使用自定义 logo
   (dashboard-banner-logo-title "Welcome to Emacs")  ;; 欢迎信息

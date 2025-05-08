@@ -4,6 +4,9 @@
 #+begin_src emacs-lisp :tangle early-init.el
 ;;; early-init.el --- Emacs pre-initialization config -*- lexical-binding: t -*-
 
+;; 定义正常垃圾回收阈值
+(defvar normal-gc-cons-threshold (* 20 1024 1024))
+
 ;; 优化垃圾回收，加快启动速度
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6)
@@ -33,9 +36,8 @@
   (setq comp-deferred-compilation nil))
 
 ;; 启动后恢复正常垃圾回收阈值
-(let ((normal-gc-cons-threshold (* 20 1024 1024)))
-  (add-hook 'emacs-startup-hook
-            (lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
+(add-hook 'emacs-startup-hook
+          (lambda () (setq gc-cons-threshold normal-gc-cons-threshold)))
 
 (provide 'early-init)
 ;;; early-init.el ends here
@@ -235,7 +237,9 @@
   (let ((file (car (cdr command-line-args))))  ;; 获取第一个非选项参数
     (if (and file (file-exists-p file))
         (find-file file)
-      (get-buffer-create "*dashboard*"))))
+      (when (and (not (daemonp))
+                (not (get-buffer "*dashboard*")))
+        (get-buffer-create "*dashboard*")))))
 
 ;; 设置启动行为
 (setq initial-buffer-choice #'my/startup-buffer)
@@ -244,7 +248,8 @@
 (add-hook 'after-init-hook
           (lambda ()
             (when (and (not (daemonp))
-                      (not (get-buffer "*dashboard*")))
+                      (not (get-buffer "*dashboard*"))
+                      (not (cdr command-line-args)))  ;; 只有在没有命令行参数时才显示 dashboard
               (dashboard-refresh-buffer))))
 
 (provide 'init-startup)
@@ -261,8 +266,6 @@
 
 (use-package dashboard
   :ensure t
-  :init
-  (add-hook 'after-init-hook 'dashboard-refresh-buffer)
   :custom
   (dashboard-startup-banner (or centaur-logo 'official))  ;; 使用自定义 logo
   (dashboard-banner-logo-title "Welcome to Emacs")  ;; 欢迎信息

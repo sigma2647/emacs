@@ -19,7 +19,9 @@
   (let ((file (car (cdr command-line-args))))  ;; 获取第一个非选项参数
     (if (and file (file-exists-p file))
         (find-file file)
-      (get-buffer-create "*dashboard*"))))
+      (when (and (not (daemonp))
+                (not (get-buffer "*dashboard*")))
+        (get-buffer-create "*dashboard*")))))
 
 ;; 设置启动行为
 (setq initial-buffer-choice #'my/startup-buffer)
@@ -28,7 +30,8 @@
 (add-hook 'after-init-hook
           (lambda ()
             (when (and (not (daemonp))
-                      (not (get-buffer "*dashboard*")))
+                      (not (get-buffer "*dashboard*"))
+                      (not (cdr command-line-args)))  ;; 只有在没有命令行参数时才显示 dashboard
               (dashboard-refresh-buffer))))
 
 (provide 'init-startup)

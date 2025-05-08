@@ -1,6 +1,9 @@
 ;; [[file:init.org::*Early Init 配置][Early Init 配置:1]]
 ;;; early-init.el --- Emacs pre-initialization config -*- lexical-binding: t -*-
 
+;; 定义正常垃圾回收阈值
+(defvar normal-gc-cons-threshold (* 20 1024 1024))
+
 ;; 优化垃圾回收，加快启动速度
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6)
@@ -30,9 +33,8 @@
   (setq comp-deferred-compilation nil))
 
 ;; 启动后恢复正常垃圾回收阈值
-(let ((normal-gc-cons-threshold (* 20 1024 1024)))
-  (add-hook 'emacs-startup-hook
-            (lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
+(add-hook 'emacs-startup-hook
+          (lambda () (setq gc-cons-threshold normal-gc-cons-threshold)))
 
 (provide 'early-init)
 ;;; early-init.el ends here
