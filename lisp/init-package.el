@@ -10,8 +10,8 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; Ensure `use-package`, `evil`, and `markdown-mode` are installed
-(dolist (pkg '(use-package evil markdown-mode))
+;; Ensure `use-package`, `evil`, `markdown-mode`, `vertico`, and `orderless` are installed
+(dolist (pkg '(use-package evil markdown-mode vertico orderless))
   (unless (package-installed-p pkg)
     (package-install pkg)))
 

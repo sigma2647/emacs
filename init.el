@@ -10,8 +10,9 @@
 (require 'init-font)
 (require 'init-markdown)
 (require 'init-org)
-(require 'init-startup)  ;; 添加启动配置
-(require 'init-dashboard)  ;; 添加 dashboard 模块
+(require 'init-startup)
+(require 'init-dashboard)
+(require 'init-completion)  ;; 添加补全系统配置
 
 ;; 确保必要的包已安装
 (use-package visual-fill-column :ensure t)

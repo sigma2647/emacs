@@ -62,6 +62,21 @@
   ;; 设置 M-p 为 execute-extended-command
   (global-set-key (kbd "M-p") 'execute-extended-command)
 
+  ;; 自动更新文件
+  (setq auto-revert-interval 1)  ;; 每秒检查一次
+  (setq auto-revert-check-vc-info t)  ;; 检查版本控制信息
+  (setq auto-revert-verbose nil)  ;; 不显示提示信息
+  (setq auto-revert-use-notify t)  ;; 使用文件系统通知
+  (setq auto-revert-stop-on-user-input nil)  ;; 用户输入时继续更新
+  (setq auto-revert-remote-files t)  ;; 支持远程文件
+  (global-auto-revert-mode 1)  ;; 全局启用
+
+  ;; 优化文件监控
+  (when (and (fboundp 'file-notify-add-watch)
+             (executable-find "inotifywait"))
+    (setq auto-revert-notify-exclude-dir-regexp
+          (concat "\\`" (regexp-opt '("/tmp" "/var/tmp" "/dev" "/sys" "/proc")) "\\'")))
+
   (provide 'init-basic)
 #+end_src
 
@@ -78,8 +93,8 @@
   (unless package-archive-contents
     (package-refresh-contents))
 
-  ;; Ensure `use-package`, `evil`, and `markdown-mode` are installed
-  (dolist (pkg '(use-package evil markdown-mode))
+  ;; Ensure `use-package`, `evil`, `markdown-mode`, `vertico`, and `orderless` are installed
+  (dolist (pkg '(use-package evil markdown-mode vertico orderless))
     (unless (package-installed-p pkg)
       (package-install pkg)))
 
@@ -327,6 +342,66 @@
 (provide 'init-dashboard)
 #+end_src
 
+* 补全系统配置
+#+begin_src emacs-lisp :tangle lisp/init-completion.el
+;;; init-completion.el --- Initialize completion configurations -*- lexical-binding: t -*-
+
+;; 启用 vertico
+(use-package vertico
+  :ensure t
+  :init
+  (vertico-mode)
+  :custom
+  (vertico-cycle t)  ;; 循环选择
+  (vertico-resize t) ;; 自动调整大小
+  (vertico-count 10) ;; 显示10个候选项
+  (vertico-scroll-margin 0)) ;; 滚动边距
+
+;; 启用 orderless 补全风格
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles basic-remote orderless)))))
+
+;; 配置 M-x 命令补全
+(defun my/vertico-command-completion ()
+  "Configure command completion for M-x."
+  (setq-local vertico-sort-function nil)  ;; 禁用排序
+  (setq-local vertico-group-format #'vertico-group-format)  ;; 启用分组
+  (setq-local vertico-count-format #'vertico-count-format))  ;; 启用计数
+
+(add-hook 'vertico-mode-hook #'my/vertico-command-completion)
+
+;; 配置 M-x 命令历史
+(use-package savehist
+  :ensure t
+  :init
+  (savehist-mode)
+  :custom
+  (savehist-additional-variables '(extended-command-history)))
+
+;; 配置命令建议
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode)
+  :custom
+  (marginalia-align 'right)
+  (marginalia-annotators '(marginalia-annotators-heavy)))
+
+;; 配置命令提示
+(use-package consult
+  :ensure t
+  :custom
+  (consult-preview-key nil)  ;; 禁用预览
+  (consult-narrow-key "<")   ;; 设置窄化键
+  (consult-widen-key ">"))   ;; 设置扩展键
+
+(provide 'init-completion)
+#+end_src
+
 * 主入口
 #+begin_src emacs-lisp :tangle init.el
   ;; 添加 lisp 目录到 load-path
@@ -340,8 +415,9 @@
   (require 'init-font)
   (require 'init-markdown)
   (require 'init-org)
-  (require 'init-startup)  ;; 添加启动配置
-  (require 'init-dashboard)  ;; 添加 dashboard 模块
+  (require 'init-startup)
+  (require 'init-dashboard)
+  (require 'init-completion)  ;; 添加补全系统配置
 
   ;; 确保必要的包已安装
   (use-package visual-fill-column :ensure t)
