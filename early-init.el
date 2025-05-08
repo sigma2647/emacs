@@ -1,3 +1,4 @@
+;; [[file:init.org::*Early Init 配置][Early Init 配置:1]]
 ;;; early-init.el --- Emacs pre-initialization config -*- lexical-binding: t -*-
 
 ;; 优化垃圾回收，加快启动速度
@@ -34,4 +35,5 @@
             (lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
 
 (provide 'early-init)
-;;; early-init.el ends here 
+;;; early-init.el ends here
+;; Early Init 配置:1 ends here

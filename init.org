@@ -1,7 +1,70 @@
-#+Property: header-args :tangle yes :comments yes :results silent
+#+PROPERTY: header-args :comments yes :results silent
 
-* add mirror
-#+begin_src emacs-lisp
+* Early Init 配置
+#+begin_src emacs-lisp :tangle early-init.el
+;;; early-init.el --- Emacs pre-initialization config -*- lexical-binding: t -*-
+
+;; 优化垃圾回收，加快启动速度
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.6)
+
+;; 禁用 package.el 自动加载
+(setq package-enable-at-startup nil)
+(setq package-quickstart nil)
+
+;; 禁用菜单栏、工具栏、滚动条
+(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(tool-bar-lines . 0) default-frame-alist)
+(push '(vertical-scroll-bars) default-frame-alist)
+
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+
+;; 禁用启动画面和文件对话框
+(setq inhibit-splash-screen t
+      use-file-dialog nil)
+
+;; 禁止自动缩放窗口
+(setq frame-inhibit-implied-resize t)
+
+;; Emacs 28+：禁止延迟编译
+(when (boundp 'comp-deferred-compilation)
+  (setq comp-deferred-compilation nil))
+
+;; 启动后恢复正常垃圾回收阈值
+(let ((normal-gc-cons-threshold (* 20 1024 1024)))
+  (add-hook 'emacs-startup-hook
+            (lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
+
+(provide 'early-init)
+;;; early-init.el ends here
+#+end_src
+
+* 基础配置
+#+begin_src emacs-lisp :tangle lisp/init-basic.el
+  ;; 基础设置
+  (setq inhibit-splash-screen t)
+  (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+  (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+  (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+
+  ;; 编码设置
+  (prefer-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (setq locale-coding-system 'utf-8)
+  (setq default-buffer-file-coding-system 'utf-8)
+
+  ;; 设置 M-p 为 execute-extended-command
+  (global-set-key (kbd "M-p") 'execute-extended-command)
+
+  (provide 'init-basic)
+#+end_src
+
+* 包管理配置
+#+begin_src emacs-lisp :tangle lisp/init-package.el
   (require 'package)
   (setq package-archives
         '(("gnu"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
@@ -18,13 +81,11 @@
     (unless (package-installed-p pkg)
       (package-install pkg)))
 
-  ;; Make M-p work like M-x
-  (global-set-key (kbd "M-p") 'execute-extended-command)
+  (provide 'init-package)
 #+end_src
 
-
-* evilmode
-#+begin_src emacs-lisp
+* Evil 配置
+#+begin_src emacs-lisp :tangle lisp/init-evil.el
   (require 'evil)
   (evil-mode 1)
 
@@ -39,41 +100,12 @@
 
   ;; 在进入普通模式时切换到英文输入法
   (add-hook 'evil-normal-state-entry-hook 'switch-to-english-input)
+
+  (provide 'init-evil)
 #+end_src
 
-* Level 1
-
-** Level 2
-
-
-#+begin_src emacs-lisp
-
-  (setq inhibit-splash-screen t)
-  (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-  (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-  (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-  (menu-bar-mode -1)
-
-
-
-  (prefer-coding-system 'utf-8)
-  (set-terminal-coding-system 'utf-8)
-  (set-keyboard-coding-system 'utf-8)
-  (set-selection-coding-system 'utf-8)
-  (setq locale-coding-system 'utf-8)
-  (setq default-buffer-file-coding-system 'utf-8)
-
-
-
-
-
-#+end_src
-
-*** UI
-
-enable pixel scroll
-
-#+begin_src emacs-lisp
+* UI 配置
+#+begin_src emacs-lisp :tangle lisp/init-ui.el
   ;; Enable pixel scroll
   (pixel-scroll-precision-mode 1)
   
@@ -102,91 +134,85 @@ enable pixel scroll
   ;; Add hook to enable relative line numbers
   (add-hook 'prog-mode-hook 'enable-relative-line-numbers)
   (add-hook 'text-mode-hook 'enable-relative-line-numbers)
+
+  (provide 'init-ui)
 #+end_src
 
-** org mode
-#+begin_src emacs-lisp
-  (require 'org-tempo)
-#+end_src
-
-* TODO evilmode
-* TODO magit
-* TODO Package Manager / Use Package
-
-
-* font
-
-
-
-#+begin_src emacs-lisp
-
-;; 设置默认字体族和大小。
-;; "Maple Mono NF CN" 字体设计旨在实现 CJK 字符与拉丁字符 2:1 的宽度比。
-(set-face-attribute 'default nil
+* 字体配置
+#+begin_src emacs-lisp :tangle lisp/init-font.el
+  ;; 设置默认字体族和大小
+  (set-face-attribute 'default nil
                     :font "Maple Mono NF CN"
-                    :height 140) ; 根据需要调整高度（单位：1/10pt）
+                    :height 130)
 
-;; 确保 fixed-pitch face 也使用 Maple Mono NF CN 并继承高度。
-(set-face-attribute 'fixed-pitch nil
+  ;; 确保 fixed-pitch face 也使用 Maple Mono NF CN
+  (set-face-attribute 'fixed-pitch nil
                     :font "Maple Mono NF CN"
                     :height (face-attribute 'default :height))
 
-;; 关键步骤：告知 Emacs 为 'han' (CJK) 字符使用 "Maple Mono NF CN"。
-;; 这使得 Emacs 可以利用该字体固有的 CJK 字符 2:1 宽度特性。
-;; 第一个参数 t 表示此设置应用于标准字体集。
-;; 明确指定高度以匹配 default face，这可能有助于解决缩放相关的对齐问题。
-(set-fontset-font t 'han (font-spec :family "Maple Mono NF CN" :height (face-attribute 'default :height)))
+  ;; 为 CJK 字符设置字体
+  (set-fontset-font t 'han (font-spec :family "Maple Mono NF CN" 
+                                    :height (face-attribute 'default :height)))
 
-;; 可选项：如果希望 variable-pitch 文本（例如某些 Org mode 视图中）
-;; 也使用等宽字体，请取消注释以下代码。
-;; 否则，variable-pitch 将使用系统的比例宽度字体。
-; (set-face-attribute 'variable-pitch nil
-;                     :font "Maple Mono NF CN"
-;                     :height (face-attribute 'default :height))
-
-;; 配置 Org table 字体，并继承高度。
-(set-face-attribute 'org-table nil
+  ;; 确保所有等宽文本使用相同字体
+  (set-face-attribute 'fixed-pitch-serif nil
                     :font "Maple Mono NF CN"
                     :height (face-attribute 'default :height))
 
-;; 关于 `char-width-alist`:
-;; 如果 "Maple Mono NF CN" 被正确用于 'han' 书写系统 (通过 set-fontset-font),
-;; 则很可能不再需要此设置，因为字体本身应能处理 2:1 的宽度。
-;; 尝试时不使用此行。如果仍有问题，可以尝试添加 (setq char-width-alist '((han . 2)))。
-;; 注意：书写系统名称应为 'han'，而非 'chinese'。
-;; ;; (setq char-width-alist '((han . 2))) ;; 保持注释，除非测试表明需要
-
-;; 标准 Org mode 表格对齐设置（通常是好的）
-(setq org-table-align-indent t)
-(setq org-table-align-char ?\s) ;; Corrected syntax
-
-;; 应用此配置后，请重启 Emacs 或重新加载配置。
-;; 使用 C-u C-x = 检查 CJK 字符的属性，确认字体和脚本。
-;; 仔细检查表格对齐情况。
+  (provide 'init-font)
 #+end_src
 
-* Markdown Mode
-#+begin_src emacs-lisp
+* Markdown 配置
+#+begin_src emacs-lisp :tangle lisp/init-markdown.el
   (use-package markdown-mode
     :ensure t
-    :mode (("\\.md\\\'" . gfm-mode)
-           ("\\.markdown\\\'" . gfm-mode))
+    :mode (("\\.md\\'" . gfm-mode)
+           ("\\.markdown\\'" . gfm-mode))
     :init
-    (setq markdown-command "multimarkdown")) ;; Or your preferred markdown processor
+    (setq markdown-command "multimarkdown"))
+
+  (provide 'init-markdown)
+#+end_src
+
+* Org 配置
+#+begin_src emacs-lisp :tangle lisp/init-org.el
+  (require 'org-tempo)
+
+  ;; 配置 Org table 字体
+  (set-face-attribute 'org-table nil
+                    :font "Maple Mono NF CN"
+                    :height (face-attribute 'default :height))
+
+  ;; Org mode 表格对齐设置
+  (setq org-table-align-indent t)
+  (setq org-table-align-char ?\s)
+
+  ;; 确保 Org 表格中的字体大小正确
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (set-face-attribute 'org-table nil
+                                :font "Maple Mono NF CN"
+                                :height (face-attribute 'default :height))))
+
+  (provide 'init-org)
+#+end_src
+
+* 主入口
+#+begin_src emacs-lisp :tangle init.el
+  ;; 添加 lisp 目录到 load-path
+  (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+
+  ;; 加载各个模块
+  (require 'init-basic)
+  (require 'init-package)
+  (require 'init-evil)
+  (require 'init-ui)
+  (require 'init-font)
+  (require 'init-markdown)
+  (require 'init-org)
 #+end_src
 
 * Local Variables
-
 # Local Variables:
-# eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
+# eval: (add-hook 'after-save-hook (lambda () (org-babel-tangle)) nil t)
 # End:
-
-
-
-
-sdfsdf
-
-| sdf  | sdf |
-| iikj |     |
-| sdf  |     |
-|      |     |
