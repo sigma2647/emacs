@@ -10,8 +10,8 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; Ensure `use-package` and `evil` are installed
-(dolist (pkg '(use-package evil))
+;; Ensure `use-package`, `evil`, and `markdown-mode` are installed
+(dolist (pkg '(use-package evil markdown-mode))
   (unless (package-installed-p pkg)
     (package-install pkg)))
 
@@ -22,6 +22,18 @@
 ;; [[file:init.org::*evilmode][evilmode:1]]
 (require 'evil)
 (evil-mode 1)
+
+;; 检查 fcitx5-remote 是否可用
+(defun check-fcitx5-remote ()
+  (executable-find "fcitx5-remote"))
+
+;; 切换到英文输入法
+(defun switch-to-english-input ()
+  (when (check-fcitx5-remote)
+    (call-process "fcitx5-remote" nil nil nil "-c")))
+
+;; 在进入普通模式时切换到英文输入法
+(add-hook 'evil-normal-state-entry-hook 'switch-to-english-input)
 ;; evilmode:1 ends here
 
 ;; [[file:init.org::*Level 2][Level 2:1]]
@@ -42,10 +54,34 @@
 ;; Level 2:1 ends here
 
 ;; [[file:init.org::*UI][UI:1]]
+;; Enable pixel scroll
 (pixel-scroll-precision-mode 1)
+
+;; Enable smooth scrolling
 (setq pixel-scroll-precision-interpolate-page t)
+
+;; Use pixel scroll for all scrolling commands
 (defalias 'scroll-up-command 'pixel-scroll-interpolate-down)
 (defalias 'scroll-down-command 'pixel-scroll-interpolate-up)
+
+;; Additional scroll settings for better experience
+(setq scroll-conservatively 101)  ;; Don't recenter point
+(setq scroll-margin 0)            ;; No margin when scrolling
+(setq scroll-preserve-screen-position t)  ;; Keep cursor position relative to screen
+(setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))  ;; Fine-tune mouse wheel scrolling
+(setq mouse-wheel-progressive-speed nil)  ;; Disable progressive speed
+
+;; Enable relative line numbers for non-org and non-markdown files
+(defun enable-relative-line-numbers ()
+  (unless (or (derived-mode-p 'org-mode)
+              (derived-mode-p 'markdown-mode)
+              (derived-mode-p 'gfm-mode))
+    (display-line-numbers-mode 1)
+    (setq display-line-numbers-type 'relative)))
+
+;; Add hook to enable relative line numbers
+(add-hook 'prog-mode-hook 'enable-relative-line-numbers)
+(add-hook 'text-mode-hook 'enable-relative-line-numbers)
 ;; UI:1 ends here
 
 ;; [[file:init.org::*org mode][org mode:1]]
@@ -67,9 +103,8 @@
 ;; 关键步骤：告知 Emacs 为 'han' (CJK) 字符使用 "Maple Mono NF CN"。
 ;; 这使得 Emacs 可以利用该字体固有的 CJK 字符 2:1 宽度特性。
 ;; 第一个参数 t 表示此设置应用于标准字体集。
-(set-fontset-font t 'han (font-spec :family "Maple Mono NF CN"))
-;; 如果需要为 Han 字符明确指定与 default face 相同的大小，可使用：
-;; (set-fontset-font t 'han (font-spec :family "Maple Mono NF CN" :height (face-attribute 'default :height)))
+;; 明确指定高度以匹配 default face，这可能有助于解决缩放相关的对齐问题。
+(set-fontset-font t 'han (font-spec :family "Maple Mono NF CN" :height (face-attribute 'default :height)))
 
 ;; 可选项：如果希望 variable-pitch 文本（例如某些 Org mode 视图中）
 ;; 也使用等宽字体，请取消注释以下代码。
@@ -83,17 +118,27 @@
                     :font "Maple Mono NF CN"
                     :height (face-attribute 'default :height))
 
-;; 用户原配置中的以下 `char-width-alist` 设置，
-;; 如果 "Maple Mono NF CN" 被正确用于 'han' 书写系统，则很可能不再需要，
-;; 因为字体本身会处理 2:1 的宽度。
-;; 另外，书写系统名称 'chinese' 是不正确的，应为 'han'。
-;; 请首先尝试不使用此行代码。
-;; (setq char-width-alist '((han. 2)))
+;; 关于 `char-width-alist`:
+;; 如果 "Maple Mono NF CN" 被正确用于 'han' 书写系统 (通过 set-fontset-font),
+;; 则很可能不再需要此设置，因为字体本身应能处理 2:1 的宽度。
+;; 尝试时不使用此行。如果仍有问题，可以尝试添加 (setq char-width-alist '((han . 2)))。
+;; 注意：书写系统名称应为 'han'，而非 'chinese'。
+;; ;; (setq char-width-alist '((han . 2))) ;; 保持注释，除非测试表明需要
 
-;; 用户原配置中的标准 Org mode 表格对齐设置（通常是好的）
+;; 标准 Org mode 表格对齐设置（通常是好的）
 (setq org-table-align-indent t)
-(setq org-table-align-char?\s)
+(setq org-table-align-char ?\s) ;; Corrected syntax
 
-;; 应用此配置后，请使用 C-u C-x = 检查 CJK 字符的属性，
-;; 并检查表格对齐情况。
+;; 应用此配置后，请重启 Emacs 或重新加载配置。
+;; 使用 C-u C-x = 检查 CJK 字符的属性，确认字体和脚本。
+;; 仔细检查表格对齐情况。
 ;; font:1 ends here
+
+;; [[file:init.org::*Markdown Mode][Markdown Mode:1]]
+(use-package markdown-mode
+  :ensure t
+  :mode (("\\.md\\\'" . gfm-mode)
+         ("\\.markdown\\\'" . gfm-mode))
+  :init
+  (setq markdown-command "multimarkdown")) ;; Or your preferred markdown processor
+;; Markdown Mode:1 ends here
