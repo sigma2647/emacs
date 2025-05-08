@@ -12,4 +12,7 @@
 (require 'init-org)
 (require 'init-startup)  ;; 添加启动配置
 (require 'init-dashboard)  ;; 添加 dashboard 模块
+
+;; 确保必要的包已安装
+(use-package visual-fill-column :ensure t)
 ;; 主入口:1 ends here
