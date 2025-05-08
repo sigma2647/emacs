@@ -53,23 +53,47 @@
 ;; org mode:1 ends here
 
 ;; [[file:init.org::*font][font:1]]
-(set-face-attribute 'default nil :font "Maple Mono NF CN" :height 140)  ; 14pt
+;; 设置默认字体族和大小。
+;; "Maple Mono NF CN" 字体设计旨在实现 CJK 字符与拉丁字符 2:1 的宽度比。
+(set-face-attribute 'default nil
+                    :font "Maple Mono NF CN"
+                    :height 140) ; 根据需要调整高度（单位：1/10pt）
 
-;; 显式设置中文字体（可选，如果 Maple Mono NF CN 已经含中文）
+;; 确保 fixed-pitch face 也使用 Maple Mono NF CN 并继承高度。
+(set-face-attribute 'fixed-pitch nil
+                    :font "Maple Mono NF CN"
+                    :height (face-attribute 'default :height))
+
+;; 关键步骤：告知 Emacs 为 'han' (CJK) 字符使用 "Maple Mono NF CN"。
+;; 这使得 Emacs 可以利用该字体固有的 CJK 字符 2:1 宽度特性。
+;; 第一个参数 t 表示此设置应用于标准字体集。
 (set-fontset-font t 'han (font-spec :family "Maple Mono NF CN"))
+;; 如果需要为 Han 字符明确指定与 default face 相同的大小，可使用：
+;; (set-fontset-font t 'han (font-spec :family "Maple Mono NF CN" :height (face-attribute 'default :height)))
+
+;; 可选项：如果希望 variable-pitch 文本（例如某些 Org mode 视图中）
+;; 也使用等宽字体，请取消注释以下代码。
+;; 否则，variable-pitch 将使用系统的比例宽度字体。
+; (set-face-attribute 'variable-pitch nil
+;                     :font "Maple Mono NF CN"
+;                     :height (face-attribute 'default :height))
+
+;; 配置 Org table 字体，并继承高度。
+(set-face-attribute 'org-table nil
+                    :font "Maple Mono NF CN"
+                    :height (face-attribute 'default :height))
+
+;; 用户原配置中的以下 `char-width-alist` 设置，
+;; 如果 "Maple Mono NF CN" 被正确用于 'han' 书写系统，则很可能不再需要，
+;; 因为字体本身会处理 2:1 的宽度。
+;; 另外，书写系统名称 'chinese' 是不正确的，应为 'han'。
+;; 请首先尝试不使用此行代码。
+;; (setq char-width-alist '((han. 2)))
+
+;; 用户原配置中的标准 Org mode 表格对齐设置（通常是好的）
+(setq org-table-align-indent t)
+(setq org-table-align-char?\s)
+
+;; 应用此配置后，请使用 C-u C-x = 检查 CJK 字符的属性，
+;; 并检查表格对齐情况。
 ;; font:1 ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages nil)
- '(safe-local-variable-values
-   '((eval add-hook 'after-save-hook (lambda nil (org-babel-tangle)) nil
-	   t))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
