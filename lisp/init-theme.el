@@ -77,11 +77,5 @@
 
 (add-hook 'org-mode-hook 'my/org-prettify-inline-code)
 
-;; 全局启用行号但在特定模式禁用
-(global-display-line-numbers-mode 1)
-(dolist (mode '(org-mode vterm-mode eshell-mode shell-mode term-mode dashboard-mode))
-  (add-hook (intern (format "%s-hook" mode)) 
-            (lambda () (display-line-numbers-mode 0))))
-
 (provide 'init-theme)
 ;; 主题配置:1 ends here

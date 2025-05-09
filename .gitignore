@@ -27,3 +27,4 @@ history
 
 emacs.d.old
 \*dashboard\*
+lsp-servers/npm/pyright

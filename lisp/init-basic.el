@@ -1,4 +1,6 @@
 ;; [[file:../init.org::*基础配置][基础配置:1]]
+;;; init-basic.el --- Basic configurations -*- lexical-binding: t -*-
+
 ;; 基础设置
 (setq inhibit-splash-screen t)
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))

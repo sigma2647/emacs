@@ -16,17 +16,14 @@
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))  ;; Fine-tune mouse wheel scrolling
   (setq mouse-wheel-progressive-speed nil)  ;; Disable progressive speed
 
-  ;; Enable relative line numbers for non-org and non-markdown files
-  (defun enable-relative-line-numbers ()
-    (unless (or (derived-mode-p 'org-mode)
-                (derived-mode-p 'markdown-mode)
-                (derived-mode-p 'gfm-mode))
-      (display-line-numbers-mode 1)
-      (setq display-line-numbers-type 'relative)))
+  ;; 配置行号显示
+  (setq display-line-numbers-type 'relative)  ;; 设置相对行号
+  (global-display-line-numbers-mode 1)        ;; 全局启用行号
 
-  ;; Add hook to enable relative line numbers
-  (add-hook 'prog-mode-hook 'enable-relative-line-numbers)
-  (add-hook 'text-mode-hook 'enable-relative-line-numbers)
+  ;; 在特定模式下禁用行号
+  (dolist (mode '(org-mode markdown-mode gfm-mode dashboard-mode vterm-mode eshell-mode shell-mode term-mode))
+    (add-hook (intern (format "%s-hook" mode)) 
+              (lambda () (display-line-numbers-mode 0))))
 
   ;; 配置 doom-modeline
 (use-package doom-modeline

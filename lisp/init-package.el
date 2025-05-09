@@ -1,4 +1,6 @@
 ;; [[file:../init.org::*包管理配置][包管理配置:1]]
+(setq use-package-compute-statistics t) ;; Enable timing for M-x use-package-report
+
 (require 'package)
 (setq package-archives
       '(("gnu"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")

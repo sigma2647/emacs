@@ -45,43 +45,167 @@
 
 * 基础配置
 #+begin_src emacs-lisp :tangle lisp/init-basic.el
-  ;; 基础设置
-  (setq inhibit-splash-screen t)
-  (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-  (if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
-  (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+;;; init-basic.el --- Basic configurations -*- lexical-binding: t -*-
 
-  ;; 编码设置
-  (prefer-coding-system 'utf-8)
-  (set-terminal-coding-system 'utf-8)
-  (set-keyboard-coding-system 'utf-8)
-  (set-selection-coding-system 'utf-8)
-  (setq locale-coding-system 'utf-8)
-  (setq default-buffer-file-coding-system 'utf-8)
+;; 基础设置
+(setq inhibit-splash-screen t)
+(if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
-  ;; 设置 M-p 为 execute-extended-command
-  (global-set-key (kbd "M-p") 'execute-extended-command)
+;; 编码设置
+(prefer-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(setq locale-coding-system 'utf-8)
+(setq default-buffer-file-coding-system 'utf-8)
 
-  ;; 自动更新文件
-  (setq auto-revert-interval 1)  ;; 每秒检查一次
-  (setq auto-revert-check-vc-info t)  ;; 检查版本控制信息
-  (setq auto-revert-verbose nil)  ;; 不显示提示信息
-  (setq auto-revert-use-notify t)  ;; 使用文件系统通知
-  (setq auto-revert-stop-on-user-input nil)  ;; 用户输入时继续更新
-  (setq auto-revert-remote-files t)  ;; 支持远程文件
-  (global-auto-revert-mode 1)  ;; 全局启用
+;; 设置 M-p 为 execute-extended-command
+(global-set-key (kbd "M-p") 'execute-extended-command)
 
-  ;; 优化文件监控
-  (when (and (fboundp 'file-notify-add-watch)
-             (executable-find "inotifywait"))
-    (setq auto-revert-notify-exclude-dir-regexp
-          (concat "\\`" (regexp-opt '("/tmp" "/var/tmp" "/dev" "/sys" "/proc")) "\\'")))
+;; 自动更新文件
+(setq auto-revert-interval 1)  ;; 每秒检查一次
+(setq auto-revert-check-vc-info t)  ;; 检查版本控制信息
+(setq auto-revert-verbose nil)  ;; 不显示提示信息
+(setq auto-revert-use-notify t)  ;; 使用文件系统通知
+(setq auto-revert-stop-on-user-input nil)  ;; 用户输入时继续更新
+(setq auto-revert-remote-files t)  ;; 支持远程文件
+(global-auto-revert-mode 1)  ;; 全局启用
 
-  (provide 'init-basic)
+;; 优化文件监控
+(when (and (fboundp 'file-notify-add-watch)
+           (executable-find "inotifywait"))
+  (setq auto-revert-notify-exclude-dir-regexp
+        (concat "\\`" (regexp-opt '("/tmp" "/var/tmp" "/dev" "/sys" "/proc")) "\\'")))
+
+(provide 'init-basic)
+#+end_src
+
+* 语言配置
+#+begin_src emacs-lisp :tangle lisp/init-lang.el
+;;; init-lang.el --- Language specific configurations -*- lexical-binding: t -*-
+
+;; General LSP settings (for lsp-mode, often a dependency)
+(use-package lsp-mode
+  :ensure nil ; It's likely a dependency, we're just configuring it
+  :commands (lsp lsp-deferred) ; Ensures it's loaded when LSP commands are used
+  :config
+  (setq lsp-log-io nil)      ;; Disable LSP I/O logging for performance
+  (setq lsp-idle-delay 0.6)  ;; Slightly increase idle delay (default 0.5s)
+  (setq lsp-enable-file-watchers nil) ;; Disable file watchers for performance
+  (setq lsp-enable-snippet nil) ;; Disable lsp-mode's snippets if you use others or none
+  
+  ;; Server installation settings
+  (setq lsp-auto-configure t)  ;; Auto-configure LSP features
+  (setq lsp-auto-guess-root t) ;; Auto-detect project root
+  (setq lsp-enable-indentation t) ;; Enable LSP-based indentation
+  (setq lsp-enable-on-type-formatting t) ;; Enable formatting on type
+  (setq lsp-enable-symbol-highlighting t) ;; Enable symbol highlighting
+  (setq lsp-enable-text-document-color t) ;; Enable color support
+  (setq lsp-enable-semantic-highlighting t) ;; Enable semantic highlighting
+  
+  ;; Server installation preferences
+  (setq lsp-install-server-command '("npm" "install" "-g")) ;; Use npm for server installation
+  (setq lsp-server-install-dir (expand-file-name "lsp-servers" user-emacs-directory)) ;; Custom installation directory
+  
+  ;; Diagnostic settings
+  (setq lsp-diagnostic-package :none) ;; Use built-in diagnostics
+  (setq lsp-diagnostic-clean-after-change t) ;; Clean diagnostics after changes
+  (setq lsp-diagnostic-disabled-modes '(org-mode markdown-mode)) ;; Disable diagnostics in certain modes
+  )
+
+;; 通用编程配置
+(use-package editorconfig
+  :ensure t
+  :diminish
+  :hook (prog-mode . editorconfig-mode))
+
+(use-package format-all
+  :ensure t
+  :diminish
+  :hook ((prog-mode . format-all-mode)
+         (before-save . format-all-buffer))
+  :config
+  (setq format-all-formatters
+        '(("Python" black))))
+
+(use-package flycheck
+  :ensure t
+  :diminish
+  :hook (prog-mode . flycheck-mode)
+  :config
+  (setq flycheck-check-syntax-automatically '(save mode-enabled)
+        flycheck-idle-change-delay 0.5)
+  (custom-set-faces
+   '(flycheck-error ((t (:underline (:style wave :color "#ff5555")))))
+   '(flycheck-warning ((t (:underline (:style wave :color "#ffb86c")))))
+   '(flycheck-info ((t (:underline (:style wave :color "#8be9fd")))))))
+
+(use-package company
+  :ensure t
+  :diminish
+  :hook (prog-mode . company-mode)
+  :config
+  (setq company-idle-delay 0.1
+        company-minimum-prefix-length 2
+        company-tooltip-limit 10
+        company-dabbrev-downcase nil
+        company-dabbrev-ignore-case t)
+  (setq company-backends
+        '((company-capf
+           company-dabbrev-code
+           company-keywords
+           company-files)
+          (company-dabbrev))))
+
+;; 加载语言特定配置
+(require 'init-python)
+
+(provide 'init-lang)
+#+end_src
+
+* Python 配置
+#+begin_src emacs-lisp :tangle lisp/init-python.el
+;;; init-python.el --- Python specific configurations -*- lexical-binding: t -*-
+
+(use-package python
+  :ensure t
+  :defer t
+  :mode ("\\.py\\'" . python-mode)
+  :interpreter ("python" . python-mode)
+  :config
+  (setq python-indent-offset 4)
+  
+  ;; 代码格式化
+  (use-package blacken
+    :ensure t
+    :diminish
+    :hook (python-mode . blacken-mode)
+    :config 
+    (setq blacken-line-length 88
+          blacken-allow-py36 t
+          blacken-skip-string-normalization t))
+
+  ;; LSP 集成
+  (use-package lsp-pyright
+    :ensure t
+    :after python
+    :hook (python-mode . (lambda () (require 'lsp-pyright) (lsp-deferred)))
+    :config
+    (setq lsp-pyright-use-library-code-for-types t
+          lsp-pyright-diagnostic-mode "workspace"
+          lsp-pyright-typechecking-mode "basic"
+          lsp-pyright-auto-import-completions t
+          lsp-pyright-auto-search-paths t)))
+
+(provide 'init-python)
 #+end_src
 
 * 包管理配置
 #+begin_src emacs-lisp :tangle lisp/init-package.el
+  (setq use-package-compute-statistics t) ;; Enable timing for M-x use-package-report
+
   (require 'package)
   (setq package-archives
         '(("gnu"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
@@ -156,17 +280,14 @@
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 1)))  ;; Fine-tune mouse wheel scrolling
   (setq mouse-wheel-progressive-speed nil)  ;; Disable progressive speed
 
-  ;; Enable relative line numbers for non-org and non-markdown files
-  (defun enable-relative-line-numbers ()
-    (unless (or (derived-mode-p 'org-mode)
-                (derived-mode-p 'markdown-mode)
-                (derived-mode-p 'gfm-mode))
-      (display-line-numbers-mode 1)
-      (setq display-line-numbers-type 'relative)))
+  ;; 配置行号显示
+  (setq display-line-numbers-type 'relative)  ;; 设置相对行号
+  (global-display-line-numbers-mode 1)        ;; 全局启用行号
 
-  ;; Add hook to enable relative line numbers
-  (add-hook 'prog-mode-hook 'enable-relative-line-numbers)
-  (add-hook 'text-mode-hook 'enable-relative-line-numbers)
+  ;; 在特定模式下禁用行号
+  (dolist (mode '(org-mode markdown-mode gfm-mode dashboard-mode vterm-mode eshell-mode shell-mode term-mode))
+    (add-hook (intern (format "%s-hook" mode)) 
+              (lambda () (display-line-numbers-mode 0))))
 
   ;; 配置 doom-modeline
 (use-package doom-modeline
@@ -189,6 +310,8 @@
 
 * 字体配置
 #+begin_src emacs-lisp :tangle lisp/init-font.el
+  (setq inhibit-compacting-font-caches t) ;; Improve performance with icons/diverse fonts
+
   ;; 设置默认字体族和大小
   (set-face-attribute 'default nil
                     :font "Maple Mono NF CN"
@@ -213,14 +336,65 @@
 
 * Markdown 配置
 #+begin_src emacs-lisp :tangle lisp/init-markdown.el
-  (use-package markdown-mode
-    :ensure t
-    :mode (("\\.md\\'" . gfm-mode)
-           ("\\.markdown\\'" . gfm-mode))
-    :init
-    (setq markdown-command "multimarkdown"))
+;;; init-markdown.el --- Initialize markdown configurations -*- lexical-binding: t -*-
 
-  (provide 'init-markdown)
+(use-package markdown-mode
+  :ensure t
+  :defer t  ;; 延迟加载
+  :mode (("\\.md\\'" . gfm-mode)
+         ("\\.markdown\\'" . gfm-mode))
+  :init
+  (setq markdown-command "multimarkdown")
+  :custom
+  (markdown-fontify-code-blocks-natively t)
+  (markdown-header-scaling t)
+  (markdown-hide-urls t)
+  (markdown-indent-on-enter 'indent-and-new-item)
+  (markdown-list-indent-width 2))
+
+;; 使用 org-modern 风格的标题样式
+(custom-set-faces
+ '(markdown-header-face-1 ((t (:inherit org-level-1 :height 1.5 :weight bold))))
+ '(markdown-header-face-2 ((t (:inherit org-level-2 :height 1.25 :weight bold))))
+ '(markdown-header-face-3 ((t (:inherit org-level-3 :height 1.1 :weight bold))))
+ '(markdown-header-face-4 ((t (:inherit org-level-4 :height 1.0 :weight bold))))
+ '(markdown-header-face-5 ((t (:inherit org-level-5 :height 1.0 :weight bold))))
+ '(markdown-header-face-6 ((t (:inherit org-level-6 :height 1.0 :weight bold)))))
+
+;; 使用 org-modern 风格的列表样式
+(use-package org-modern
+  :ensure t
+  :config
+  (setq org-modern-list '((?- . "•") (?+ . "◦") (?* . "▹"))))
+
+;; 使用 prettify-symbols-mode 替换特殊标记
+(defun my/markdown-prettify-symbols ()
+  "Enable prettify symbols in Markdown mode.
+Replaces common Markdown constructs with Unicode symbols for better readability."
+  (setq prettify-symbols-alist
+        '(("```" . "🖥")
+          ("`" . "⌨")
+          ("*" . "•")
+          ("**" . "✧")
+          ("***" . "✦")
+          ("_" . "▱")
+          ("__" . "▰")
+          ("~~" . "≈")))
+  (prettify-symbols-mode 1))
+
+(add-hook 'markdown-mode-hook 'my/markdown-prettify-symbols)
+
+;; 使用 olivetti 居中显示内容
+(use-package olivetti
+  :ensure t
+  :hook (markdown-mode . olivetti-mode)
+  :config
+  (setq olivetti-body-width 0.618))
+
+;; 启用自动换行
+(add-hook 'markdown-mode-hook 'visual-line-mode)
+
+(provide 'init-markdown)
 #+end_src
 
 * Org 配置
@@ -282,6 +456,8 @@
 
   ;; 使用 prettify-symbols-mode 替换特殊标记
   (defun my/org-prettify-symbols ()
+    "Enable prettify symbols in Org mode.
+Replaces common Org mode constructs with Unicode symbols for better readability."
     (setq prettify-symbols-alist
           '(("#+TITLE:" . "📘")
             ("#+AUTHOR:" . "👤")
@@ -315,6 +491,27 @@
         org-startup-with-inline-images t
         org-image-actual-width '(300)
         org-adapt-indentation nil)
+
+  ;; 美化内联代码
+  (defface org-inline-code-face
+    '((t :inherit (shadow fixed-pitch)
+         :foreground "#88c0d0"
+         :background "#2e3440"
+         :box (:line-width -1 :color "#4c566a")
+         :height 0.9))
+    "Face for inline code in Org mode.")
+
+  (defun my/org-prettify-inline-code ()
+    "Make inline code more visible in Org mode.
+Adds a subtle background and border to inline code blocks."
+    (font-lock-add-keywords
+     nil
+     '(("\\(\\\\begin{[a-zA-Z0-9]+}\\)" 1 'org-block-begin-line prepend)
+       ("\\(\\\\end{[a-zA-Z0-9]+}\\)" 1 'org-block-end-line prepend)
+       ("\\(~\\)\\([^~]+\\)\\(~\\)" (0 'org-inline-code-face t))
+       ("\\(=\\)\\([^=]+\\)\\(=\\)" (0 'org-inline-code-face t)))))  ;; 添加等号标记的代码
+
+  (add-hook 'org-mode-hook 'my/org-prettify-inline-code)
 
   (provide 'init-org)
 #+end_src
@@ -399,12 +596,6 @@
   
   (add-hook 'org-mode-hook 'my/org-prettify-inline-code)
   
-  ;; 全局启用行号但在特定模式禁用
-  (global-display-line-numbers-mode 1)
-  (dolist (mode '(org-mode vterm-mode eshell-mode shell-mode term-mode dashboard-mode))
-    (add-hook (intern (format "%s-hook" mode)) 
-              (lambda () (display-line-numbers-mode 0))))
-  
   (provide 'init-theme)
 #+end_src
 
@@ -430,9 +621,7 @@
   (let ((file (car (cdr command-line-args))))  ;; 获取第一个非选项参数
     (if (and file (file-exists-p file))
         (find-file file)
-      (when (and (not (daemonp))
-                (not (get-buffer "*dashboard*")))
-        (get-buffer-create "*dashboard*")))))
+      (get-buffer-create "*dashboard*"))))
 
 ;; 设置启动行为
 (setq initial-buffer-choice #'my/startup-buffer)
@@ -535,7 +724,7 @@
   :custom
   (completion-styles '(orderless))
   (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles basic-remote orderless)))))
+  (completion-category-overrides '((file (styles orderless)))))
 
 ;; 配置 M-x 命令补全
 (defun my/vertico-command-completion ()
@@ -549,10 +738,9 @@
 ;; 配置 M-x 命令历史
 (use-package savehist
   :ensure t
-  :init
-  (savehist-mode)
+  :init (savehist-mode 1)
   :custom
-  (savehist-additional-variables '(extended-command-history)))
+  (savehist-additional-variables '(extended-command-history file-name-history)))
 
 ;; 配置命令建议
 (use-package marginalia
@@ -570,6 +758,41 @@
   (consult-preview-key nil)  ;; 禁用预览
   (consult-narrow-key "<")   ;; 设置窄化键
   (consult-widen-key ">"))   ;; 设置扩展键
+
+;; 文件补全增强
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
+
+(use-package all-the-icons-completion
+  :ensure t
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+  :init
+  (all-the-icons-completion-mode))
+
+;; 文件补全历史记录
+(use-package recentf
+  :ensure t
+  :init
+  (recentf-mode)
+  :custom
+  (recentf-max-saved-items 100)
+  (recentf-exclude '("/tmp/" "/var/tmp/" ".git/" ".cache/"))
+  (recentf-auto-cleanup 'never))
+
+;; 确保文件补全工作
+(setq read-file-name-completion-ignore-case t
+      read-buffer-completion-ignore-case t
+      completion-ignore-case t)
+
+;; 启用部分补全
+(setq completion-styles '(orderless)
+      completion-category-defaults nil
+      completion-category-overrides '((file (styles orderless))))
+
+;; 启用文件补全缓存
+(setq file-name-history-file (expand-file-name "file-name-history" user-emacs-directory))
 
 (provide 'init-completion)
 #+end_src
@@ -589,8 +812,9 @@
   (require 'init-org)
   (require 'init-startup)
   (require 'init-dashboard)
-  (require 'init-completion)  ;; 添加补全系统配置
-  (require 'init-theme)      ;; 添加主题配置
+  (require 'init-completion)
+  (require 'init-theme)
+  (require 'init-lang)      ;; 添加语言配置
 
   ;; 确保必要的包已安装
   (use-package visual-fill-column :ensure t)

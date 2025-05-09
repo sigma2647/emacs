@@ -1,4 +1,6 @@
 ;; [[file:../init.org::*字体配置][字体配置:1]]
+(setq inhibit-compacting-font-caches t) ;; Improve performance with icons/diverse fonts
+
 ;; 设置默认字体族和大小
 (set-face-attribute 'default nil
                   :font "Maple Mono NF CN"

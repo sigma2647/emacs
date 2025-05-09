@@ -19,9 +19,7 @@
   (let ((file (car (cdr command-line-args))))  ;; 获取第一个非选项参数
     (if (and file (file-exists-p file))
         (find-file file)
-      (when (and (not (daemonp))
-                (not (get-buffer "*dashboard*")))
-        (get-buffer-create "*dashboard*")))))
+      (get-buffer-create "*dashboard*"))))
 
 ;; 设置启动行为
 (setq initial-buffer-choice #'my/startup-buffer)
