@@ -169,60 +169,20 @@
   (add-hook 'text-mode-hook 'enable-relative-line-numbers)
 
   ;; 配置 doom-modeline
-  (use-package doom-modeline
-    :ensure t
-    :init
-    (doom-modeline-mode 1)
-    :custom
-    (doom-modeline-height 25)  ;; 设置高度
-    (doom-modeline-bar-width 3)  ;; 设置指示条宽度
-    (doom-modeline-icon t)  ;; 显示图标
-    (doom-modeline-major-mode-icon t)  ;; 显示主模式图标
-    (doom-modeline-major-mode-color-icon t)  ;; 使用彩色图标
-    (doom-modeline-minor-modes t)  ;; 显示次要模式
-    (doom-modeline-buffer-encoding t)  ;; 显示编码
-    (doom-modeline-indent-info t)  ;; 显示缩进信息
-    (doom-modeline-checker-simple-format t)  ;; 简化检查器显示
-    (doom-modeline-vcs-max-length 12)  ;; 版本控制信息最大长度
-    (doom-modeline-workspace-name t)  ;; 显示工作区名称
-    (doom-modeline-persp-name t)  ;; 显示透视名称
-    (doom-modeline-display-default-persp-name t)  ;; 显示默认透视名称
-    (doom-modeline-lsp t)  ;; 显示 LSP 状态
-    (doom-modeline-github t)  ;; 显示 GitHub 信息
-    (doom-modeline-github-interval 60)  ;; GitHub 信息更新间隔
-    (doom-modeline-mu4e t)  ;; 显示 mu4e 信息
-    (doom-modeline-irc t)  ;; 显示 IRC 信息
-    (doom-modeline-irc-stylize 'identity)  ;; IRC 样式
-    (doom-modeline-battery t)  ;; 显示电池信息
-    (doom-modeline-battery-alert-threshold 20)  ;; 电池警告阈值
-    (doom-modeline-battery-update-interval 60)  ;; 电池信息更新间隔
-    (doom-modeline-time t)  ;; 显示时间
-    (doom-modeline-time-24hr t)  ;; 使用24小时制
-    (doom-modeline-time-icon t)  ;; 显示时间图标
-    (doom-modeline-env-version t)  ;; 显示环境版本
-    (doom-modeline-env-load-string "...")  ;; 环境加载字符串
-    (doom-modeline-buffer-file-name-style 'truncate-upto-project)  ;; 文件名显示样式
-    (doom-modeline-project-detection 'projectile)  ;; 使用 projectile 检测项目
-    (doom-modeline-buffer-state-icon t)  ;; 显示缓冲区状态图标
-    (doom-modeline-buffer-modification-icon t)  ;; 显示修改图标
-    (doom-modeline-unicode-fallback t)  ;; 使用 Unicode 回退
-    (doom-modeline-mu4e-alert-enable t)  ;; 启用 mu4e 提醒
-    (doom-modeline-mu4e-alert-icon t)  ;; 显示 mu4e 提醒图标
-    (doom-modeline-mu4e-alert-timeout 10)  ;; mu4e 提醒超时
-    (doom-modeline-mu4e-alert-style 'notifications)  ;; mu4e 提醒样式
-    (doom-modeline-mu4e-alert-group t)  ;; 分组 mu4e 提醒
-    (doom-modeline-mu4e-alert-group-timeout 10)  ;; mu4e 提醒组超时
-    (doom-modeline-mu4e-alert-group-style 'notifications)  ;; mu4e 提醒组样式
-    (doom-modeline-mu4e-alert-group-max 5)  ;; mu4e 提醒组最大数量
-    (doom-modeline-mu4e-alert-group-min 1)  ;; mu4e 提醒组最小数量
-    (doom-modeline-mu4e-alert-group-threshold 3)  ;; mu4e 提醒组阈值
-    (doom-modeline-mu4e-alert-group-interval 60)  ;; mu4e 提醒组间隔
-    (doom-modeline-mu4e-alert-group-timeout 10)  ;; mu4e 提醒组超时
-    (doom-modeline-mu4e-alert-group-style 'notifications)  ;; mu4e 提醒组样式
-    (doom-modeline-mu4e-alert-group-max 5)  ;; mu4e 提醒组最大数量
-    (doom-modeline-mu4e-alert-group-min 1)  ;; mu4e 提醒组最小数量
-    (doom-modeline-mu4e-alert-group-threshold 3)  ;; mu4e 提醒组阈值
-    (doom-modeline-mu4e-alert-group-interval 60))  ;; mu4e 提醒组间隔
+(use-package doom-modeline
+  :ensure t
+  :init
+  (doom-modeline-mode 1)
+  :custom
+  (doom-modeline-height 25)                ;; 设置高度
+  (doom-modeline-bar-width 3)              ;; 设置指示条宽度
+  (doom-modeline-icon t)                   ;; 显示图标
+  (doom-modeline-major-mode-icon t)        ;; 显示主模式图标
+  (doom-modeline-buffer-encoding t)        ;; 显示编码
+  (doom-modeline-indent-info t)            ;; 显示缩进信息
+  (doom-modeline-lsp t)                    ;; 显示 LSP 状态
+  (doom-modeline-time t)                   ;; 显示时间
+  (doom-modeline-time-24hr t))             ;; 使用24小时制
 
   (provide 'init-ui)
 #+end_src
@@ -269,8 +229,8 @@
 
   ;; 配置 Org table 字体
   (set-face-attribute 'org-table nil
-                    :font "Maple Mono NF CN"
-                    :height (face-attribute 'default :height))
+                     :font "Maple Mono NF CN"
+                     :height (face-attribute 'default :height))
 
   ;; Org mode 表格对齐设置
   (setq org-table-align-indent t)
@@ -282,8 +242,170 @@
               (set-face-attribute 'org-table nil
                                 :font "Maple Mono NF CN"
                                 :height (face-attribute 'default :height))))
+                                
+  ;; 设置标题样式
+  (custom-set-faces
+   '(org-document-title ((t (:height 1.75 :weight bold))))
+   '(org-level-1 ((t (:height 1.5 :weight bold))))
+   '(org-level-2 ((t (:height 1.25 :weight bold))))
+   '(org-level-3 ((t (:height 1.1 :weight bold))))
+   '(org-level-4 ((t (:height 1.0 :weight bold))))
+   '(org-level-5 ((t (:height 1.0 :weight bold))))
+   '(org-level-6 ((t (:height 1.0 :weight bold))))
+   '(org-level-7 ((t (:height 1.0 :weight bold))))
+   '(org-level-8 ((t (:height 1.0 :weight bold)))))
+
+  ;; 使用 org-modern 美化界面
+  (use-package org-modern
+    :ensure t
+    :hook (org-mode . org-modern-mode)
+    :config
+    (setq org-modern-star '("★" "☆" "◆" "◇" "▶" "▷" "✿" "❀"))
+    (setq org-modern-list '((?- . "•") (?+ . "◦") (?* . "▹")))
+    (setq org-modern-table t)
+    (setq org-modern-block-name
+          '((t . t)
+            ("src" "»" "«")
+            ("example" "»–" "–«")
+            ("quote" "❝" "❞"))))
+
+  ;; 使用 org-appear 显示强调标记
+  (use-package org-appear
+    :ensure t
+    :hook (org-mode . org-appear-mode)
+    :config
+    (setq org-appear-autolinks t
+          org-appear-autosubmarkers t
+          org-appear-autoentities t
+          org-appear-autokeywords t
+          org-appear-inside-latex t))
+
+  ;; 使用 prettify-symbols-mode 替换特殊标记
+  (defun my/org-prettify-symbols ()
+    (setq prettify-symbols-alist
+          '(("#+TITLE:" . "📘")
+            ("#+AUTHOR:" . "👤")
+            ("#+DATE:" . "📅")
+            ("#+EMAIL:" . "📧")
+            ("#+OPTIONS:" . "⚙")
+            ("#+BEGIN_SRC" . "🖥")
+            ("#+END_SRC" . "🖥")
+            ("#+BEGIN_QUOTE" . "❝")
+            ("#+END_QUOTE" . "❞")
+            ("#+RESULTS:" . "📊")))
+    (prettify-symbols-mode 1))
+  (add-hook 'org-mode-hook 'my/org-prettify-symbols)
+
+  ;; 使用 olivetti 居中显示内容
+  (use-package olivetti
+    :ensure t
+    :hook (org-mode . olivetti-mode)
+    :config
+    (setq olivetti-body-width 0.618))
+
+  ;; 设置其他 Org-mode 选项
+  (setq org-hide-emphasis-markers t
+        org-startup-indented t
+        org-ellipsis " ▼ "
+        org-pretty-entities t
+        org-fontify-whole-heading-line t
+        org-fontify-done-headline t
+        org-fontify-quote-and-verse-blocks t
+        org-hide-leading-stars t
+        org-startup-with-inline-images t
+        org-image-actual-width '(300)
+        org-adapt-indentation nil)
 
   (provide 'init-org)
+#+end_src
+
+* 主题配置
+#+begin_src emacs-lisp :tangle lisp/init-theme.el
+  ;; 安装doom-themes和所有图标
+  (use-package doom-themes
+    :ensure t
+    :config
+    ;; 全局设置
+    (setq doom-themes-enable-bold t    ; 如果nil，粗体将被禁用
+          doom-themes-enable-italic t) ; 如果nil，斜体将被禁用
+    
+    ;; 加载Nord主题（冷色系）
+    (load-theme 'doom-nord t)
+    
+    ;; 启用闪亮的代码块
+    (doom-themes-org-config)
+    
+    ;; 改进代码块边框和背景
+    (custom-set-faces
+     '(org-block-begin-line ((t (:foreground "#5B6268" :background "#2d333b" :extend t :italic t :height 0.9))))
+     '(org-block ((t (:background "#21242b" :extend t))))
+     '(org-block-end-line ((t (:foreground "#5B6268" :background "#2d333b" :extend t :italic t :height 0.9))))))
+  
+  ;; 代码块美化设置
+  (use-package highlight-indent-guides
+    :ensure t
+    :hook (prog-mode . highlight-indent-guides-mode)
+    :config
+    (setq highlight-indent-guides-method 'character
+          highlight-indent-guides-responsive 'top
+          highlight-indent-guides-delay 0
+          highlight-indent-guides-auto-character-face-perc 30))
+  
+  ;; 彩虹分隔符
+  (use-package rainbow-delimiters
+    :ensure t
+    :hook (prog-mode . rainbow-delimiters-mode))
+  
+  ;; 代码块美化
+  (use-package org-bullets
+    :ensure t
+    :hook (org-mode . org-bullets-mode)
+    :custom
+    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+  
+  ;; 为org-modern和olivetti模式提供更好的主题集成
+  (with-eval-after-load 'org-modern
+    (custom-set-faces
+     '(org-modern-label ((t (:height 0.9 :box (:line-width -1 :color "#81a1c1") :foreground "#81a1c1" :background "#2e3440"))))
+     '(org-modern-tag ((t (:foreground "#5e81ac" :background "#2e3440" :box (:line-width -1 :color "#4c566a")))))))
+  
+  ;; 提供自定义的modeline配置
+  (with-eval-after-load 'doom-modeline
+    (custom-set-faces
+     '(mode-line ((t (:background "#3b4252" :foreground "#eceff4"))))
+     '(mode-line-inactive ((t (:background "#2e3440" :foreground "#4c566a"))))))
+  
+  ;; 源代码块语法高亮
+  (setq org-src-fontify-natively t
+        org-src-tab-acts-natively t
+        org-confirm-babel-evaluate nil
+        org-edit-src-content-indentation 0)
+        
+  ;; 美化内联代码
+  (defface org-inline-code-face
+    '((t :inherit (shadow fixed-pitch)
+         :foreground "#88c0d0"
+         :background "#2e3440"
+         :box (:line-width -1 :color "#4c566a")))
+    "Face for inline code in Org mode.")
+  
+  (defun my/org-prettify-inline-code ()
+    "Make inline code more visible in Org mode."
+    (font-lock-add-keywords
+     nil
+     '(("\\(\\\\begin{[a-zA-Z0-9]+}\\)" 1 'org-block-begin-line prepend)
+       ("\\(\\\\end{[a-zA-Z0-9]+}\\)" 1 'org-block-end-line prepend)
+       ("\\(~\\)\\([^~]+\\)\\(~\\)" (0 'org-inline-code-face t)))))
+  
+  (add-hook 'org-mode-hook 'my/org-prettify-inline-code)
+  
+  ;; 全局启用行号但在特定模式禁用
+  (global-display-line-numbers-mode 1)
+  (dolist (mode '(org-mode vterm-mode eshell-mode shell-mode term-mode dashboard-mode))
+    (add-hook (intern (format "%s-hook" mode)) 
+              (lambda () (display-line-numbers-mode 0))))
+  
+  (provide 'init-theme)
 #+end_src
 
 * 启动配置
@@ -468,6 +590,7 @@
   (require 'init-startup)
   (require 'init-dashboard)
   (require 'init-completion)  ;; 添加补全系统配置
+  (require 'init-theme)      ;; 添加主题配置
 
   ;; 确保必要的包已安装
   (use-package visual-fill-column :ensure t)
