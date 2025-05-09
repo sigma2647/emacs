@@ -4,70 +4,61 @@
 ;; 确保 all-the-icons 已安装并正确加载
 (use-package all-the-icons
   :ensure t
-  :if (display-graphic-p)
-  :config
-  (require 'all-the-icons))
+  :if (display-graphic-p))
 
 (use-package dashboard
   :ensure t
   :init
-  :custom
-  (dashboard-startup-banner (or centaur-logo 'official))  ;; 使用自定义 logo
-  (dashboard-banner-logo-title "Welcome to Emacs")  ;; 欢迎信息
-  (dashboard-set-heading-icons t)  ;; 显示标题图标
-  (dashboard-set-file-icons t)     ;; 显示文件图标
-  (dashboard-center-content t)     ;; 居中显示内容
-  (dashboard-image-banner-max-width 300)  ;; 图片最大宽度
-  (dashboard-image-banner-max-height 300) ;; 图片最大高度
-  (dashboard-items '((recents  . 5)    ;; 最近文件数量
-                     (projects . 5)    ;; 项目数量
-                     (bookmarks . 5)   ;; 书签数量
-                     (agenda . 5)      ;; 日程数量
-                     (registers . 5))) ;; 寄存器数量
-  (dashboard-show-shortcuts t)     ;; 显示快捷键
-  (dashboard-set-navigator t)      ;; 显示导航器
-  (dashboard-set-init-info t)      ;; 显示初始化信息
-  (dashboard-set-footer t)         ;; 显示页脚
+  ;; 基本设置
+  (setq dashboard-startup-banner (or centaur-logo 'official))  ;; 保留自定义 logo
+  (setq dashboard-banner-logo-title "Welcome to Emacs")  ;; 欢迎信息
+  
+  ;; 关键居中设置
+  (setq dashboard-center-content t)     ;; 水平居中显示内容
+  (setq dashboard-vertically-center-content t)  ;; 垂直居中内容
+  (setq dashboard-items-default-length 5)  ;; 每个部分显示的条目数
+  
+  ;; 内容显示设置
+  (setq dashboard-set-heading-icons t)  ;; 显示标题图标
+  (setq dashboard-set-file-icons t)     ;; 显示文件图标
+  (setq dashboard-image-banner-max-width 300)  ;; 图片最大宽度
+  (setq dashboard-image-banner-max-height 300) ;; 图片最大高度
+  (setq dashboard-items '((recents  . 5)    ;; 最近文件数量
+                          ;; (projects . 5)  ;; 项目数量 - 已移除因为需要projectile
+                          (bookmarks . 5)   ;; 书签数量
+                          (agenda . 5)      ;; 日程数量
+                          (registers . 5))) ;; 寄存器数量
+  
+  ;; 样式设置
+  (setq dashboard-set-navigator nil)      ;; 不显示导航器
+  (setq dashboard-set-init-info t)      ;; 显示初始化信息
+  (setq dashboard-set-footer t)         ;; 显示页脚
+  (setq dashboard-footer-messages '("Welcome to Emacs!"))  ;; 自定义页脚消息
+  
+  ;; 最关键的标题格式设置
+  (setq dashboard-item-names '(("Recent Files:" . "Recent Files:")  ;; 保持英文一致性
+                               ("Bookmarks:" . "Bookmarks:")
+                               ("Agenda for today:" . "Agenda for today:")
+                               ("Registers:" . "Registers:")))
   :config
+  ;; 图标设置 - 放在:config部分确保all-the-icons已加载
+  (when (display-graphic-p)
+    (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+                                                     :height 1.1
+                                                     :v-adjust -0.05
+                                                     :face 'font-lock-keyword-face)))
   (dashboard-setup-startup-hook))
 
 ;; 优化 dashboard 样式和性能
 (with-eval-after-load 'dashboard
-  ;; 设置 dashboard 主题
-  (setq dashboard-theme 'doom)
-  ;; 自定义 dashboard 项目
-  (setq dashboard-projects-backend 'projectile)
-  ;; 设置 dashboard 刷新间隔（秒）
-  (setq dashboard-refresh-buffer-time 300)
+  ;; 基本优化设置
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-set-navigator nil)
   
-  ;; 添加缓存机制
+  ;; 缓存设置
   (setq dashboard-cache-file (expand-file-name "dashboard-cache.el" user-emacs-directory))
-  (setq dashboard-cache-prefetch t)
-  
-  ;; 优化显示效果
-  (setq dashboard-heading-icons '((recents . "file-text")
-                                 (bookmarks . "bookmark")
-                                 (projects . "briefcase")
-                                 (agenda . "calendar")
-                                 (registers . "database")))
-  
-  ;; 自定义样式
-  (setq dashboard-footer-messages '("Welcome to Emacs!"))
-  (when (display-graphic-p)
-    (setq dashboard-footer-icon (all-the-icons-octicon "dashboard" :height 1.1 :v-adjust -0.05 :face 'font-lock-keyword-face)))
-  
-  ;; 确保内容居中
-  (setq dashboard-center-content t)
-  (setq dashboard-page-break-line t)
-  (setq dashboard-display-icons-p t)
-  (setq dashboard-icon-type 'all-the-icons)  ;; 使用 all-the-icons
-  
-  ;; 添加自定义 CSS
-  (add-hook 'dashboard-mode-hook
-            (lambda ()
-              (setq-local line-spacing 0.2)
-              (setq-local fill-column 80)
-              (setq-local visual-fill-column-center-text t))))
+  (setq dashboard-cache-prefetch t))
 
 (provide 'init-dashboard)
 ;; Dashboard 配置:1 ends here
