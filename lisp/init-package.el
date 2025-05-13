@@ -2,10 +2,12 @@
 (setq use-package-compute-statistics t) ;; Enable timing for M-x use-package-report
 
 (require 'package)
+
 (setq package-archives
-      '(("gnu"   . "https://mirrors.ustc.edu.cn/elpa/gnu/ ")
-        ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/ ")
-        ("org"   . "https://mirrors.ustc.edu.cn/elpa/emacs-policy/elpa-org/ ")))
+      '(("gnu"   . "https://mirrors.ustc.edu.cn/elpa/gnu/")
+        ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/")
+        ("org"   . "https://mirrors.ustc.edu.cn/elpa/emacs-policy/elpa-org/")))
+
 (package-initialize)
 
 ;; Ensure package contents are loaded

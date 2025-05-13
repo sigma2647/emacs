@@ -3,7 +3,7 @@
 
   ;; 配置 Org table 字体
   (set-face-attribute 'org-table nil
-                     :font "Maple Mono NF CN"
+                     :font (face-attribute 'default :font)
                      :height (face-attribute 'default :height))
 
   ;; Org mode 表格对齐设置
@@ -14,7 +14,7 @@
   (add-hook 'org-mode-hook
             (lambda ()
               (set-face-attribute 'org-table nil
-                                :font "Maple Mono NF CN"
+                                :font (face-attribute 'default :font)
                                 :height (face-attribute 'default :height))))
                                 
   ;; 设置标题样式
