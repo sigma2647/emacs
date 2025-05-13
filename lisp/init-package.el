@@ -3,9 +3,9 @@
 
 (require 'package)
 (setq package-archives
-      '(("gnu"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-        ("melpa" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-        ("org"   . "https://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
+      '(("gnu"   . "https://mirrors.ustc.edu.cn/elpa/gnu/ ")
+        ("melpa" . "https://mirrors.ustc.edu.cn/elpa/melpa/ ")
+        ("org"   . "https://mirrors.ustc.edu.cn/elpa/emacs-policy/elpa-org/ ")))
 (package-initialize)
 
 ;; Ensure package contents are loaded
